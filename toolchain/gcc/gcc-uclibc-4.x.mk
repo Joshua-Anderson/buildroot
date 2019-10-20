@@ -226,7 +226,7 @@ GCC_TLS:=--disable-tls
 endif
 
 ifeq ($(BR2_PTHREADS_NONE),y)
-THREADS:=--disable-threads
+THREADS:=--disable-threads --disable-libitm --disable-libatomic
 else
 THREADS:=--enable-threads
 endif
