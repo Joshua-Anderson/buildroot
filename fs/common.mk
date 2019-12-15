@@ -263,6 +263,7 @@ $(STAMP_DIR)/installer-%-created: $(FS_TARGETS)
 	mv $(BINARIES_DIR)/$(CUST_TARGET).* $(BINARIES_DIR)/$(CUST_TARGET)
 	-cp $(BINARIES_DIR)/vmlinuz $(BINARIES_DIR)/$(CUST_TARGET)
 	-cp $(BINARIES_DIR)/zImage $(BINARIES_DIR)/$(CUST_TARGET)
+	-cp $(BINARIES_DIR)/zImage.* $(BINARIES_DIR)/$(CUST_TARGET)/zImage
 	touch $@
 
 $(BINARIES_DIR)/snapshot.br2.tar:

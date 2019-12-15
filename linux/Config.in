@@ -124,14 +124,6 @@ config BR2_LINUX_KERNEL_CUSTOM_CONFIG_FILE
 	help
 	  Path to the kernel configuration file
 
-config BR2_LINUX_KERNEL_DTS_FILE
-    string "Device Tree dts file location"
-    depends on BR2_microblaze
-    help
-      Path from where the dts file has to be copied
-      The final "custom target" name depends on the
-      dts file name:
-          <name>.dts --> simpleImage.<name>
 #
 # Binary format
 #
@@ -150,6 +142,12 @@ config BR2_LINUX_KERNEL_BZIMAGE
 config BR2_LINUX_KERNEL_ZIMAGE
 	bool "zImage"
 	depends on BR2_arm || BR2_armeb || BR2_powerpc || BR2_sparc || BR2_sh || BR2_sh64 || BR2_xtensa
+
+config BR2_LINUX_KERNEL_APPENDED_ZIMAGE
+	bool "zImage with appended DT"
+	depends on BR2_arm || BR2_armeb
+	select BR2_LINUX_KERNEL_DTS_SUPPORT
+	select BR2_LINUX_KERNEL_APPENDED_DTB
 
 config BR2_LINUX_KERNEL_VMLINUX_BIN
 	bool "vmlinux.bin"
@@ -189,6 +187,65 @@ config BR2_LINUX_KERNEL_INSTALL_TARGET
 	  Select this option to have the kernel image installed to
 	  /boot in the target root filesystem, as is typically done on
 	  x86/x86_64 systems.
+
+config BR2_LINUX_KERNEL_DTS_SUPPORT
+	bool "Build a Device Tree Blob (DTB)"
+	help
+	  Compile one or more device tree sources into device tree
+	  blobs.
+	  Select the dts files to compile in the options below.
+
+if BR2_LINUX_KERNEL_DTS_SUPPORT
+
+# We have mainly three cases when it comes to device tree support:
+#   1) We don't want any support at all. Then the ..DTS_SUPPORT
+#      variable won't be set
+#   2) We want device tree support, so we need the user to enter the
+#      device tree name or the path to the custom device he uses, but
+#      the kernel abstracts this from us and only build an image that
+#      looks like a regular kernel image. In this case, we only need
+#      to derive the kernel image name from the given device tree
+#      name, and all the rest is as usual
+#   3) We want device tree support, but the kernel requires us to
+#      build the device tree blob separately. In this case, some
+#      more logic will be needed.
+# The variable below address the second case, were you only want
+# limited actions from buildroot.
+config BR2_LINUX_KERNEL_DTB_IS_SELF_BUILT
+	bool "DTB is built by kernel itself"
+	help
+	  Normally, the device tree(s) to be built have to be passed
+	  explicitly to the kernel build system. For some binary
+	  formats, however, the kernel build system links in the
+	  device tree directly in the kernel binary. Select this option
+	  if you have such a kernel binary format.
+
+config BR2_LINUX_KERNEL_APPENDED_DTB
+	bool
+
+config BR2_LINUX_KERNEL_INTREE_DTS_NAME
+	string "In-tree Device Tree Source file names"
+	help
+	  Name of in-tree device tree source file, without
+	  the trailing .dts. You can provide a list of
+	  dts files to build, separated by spaces.
+
+config BR2_LINUX_KERNEL_CUSTOM_DTS_PATH
+	string "Out-of-tree Device Tree Source file paths"
+	help
+	  Path to to out-of-tree device tree source files.
+	  You can provide a list of dts paths to copy and
+	  build, separated by spaces.
+
+config BR2_LINUX_KERNEL_DTB_OVERLAY_SUPPORT
+	bool "Build Device Tree with overlay support"
+	help
+	  If enabled, pass the "-@" option to dtc, such that
+	  symbols are generated in the compiled Device Tree.
+	  Choose this option to support Device Tree overlays
+	  on the target system.
+
+endif
 
 
 # Linux extensions
